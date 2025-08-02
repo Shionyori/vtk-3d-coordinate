@@ -1,46 +1,58 @@
-#include <vtkSmartPointer.h>
-
-#include <vtkSphereSource.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkActor.h>
-
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-
-#include "vtkAutoInit.h"
+#include <vtkAutoInit.h>
 VTK_MODULE_INIT(vtkRenderingOpenGL2);
 VTK_MODULE_INIT(vtkInteractionStyle);
 VTK_MODULE_INIT(vtkRenderingFreeType);
 VTK_MODULE_INIT(vtkRenderingVolumeOpenGL2);
 
+#include "Arrow.h"
+
 int main()
 {
-    vtkSmartPointer<vtkSphereSource> sphereSource = vtkSmartPointer<vtkSphereSource>::New();
-    vtkSmartPointer<vtkPolyDataMapper> sphereMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    vtkSmartPointer<vtkActor> sphereActor = vtkSmartPointer<vtkActor>::New();
+    vtkNew<vtkRenderer> renderer;
+    vtkNew<vtkRenderWindow> renWin;
+    vtkNew<vtkRenderWindowInteractor> renWinI;
 
-    sphereSource->SetRadius(0.2); // 设置球体的半径
-    sphereSource->SetCenter(0.0, 0.0, 0.0); // 设置球体的中心
-    sphereSource->SetPhiResolution(15); // 设置球体的经向分辨率
-    sphereSource->SetThetaResolution(15); // 设置球体的纬向分辨率
-
-    sphereMapper->SetInputConnection(sphereSource->GetOutputPort());
-    sphereActor->SetMapper(sphereMapper);
-
-    vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
-    vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkRenderWindow>::New();
-    vtkSmartPointer<vtkRenderWindowInteractor> iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-
-    renderer->SetBackground(0.1, 0.2, 0.3); // 设置背景颜色
-
-    renderer->AddActor(sphereActor);
     renWin->AddRenderer(renderer);
-    iren->SetRenderWindow(renWin);
+    renWinI->SetRenderWindow(renWin);
+    renWinI->Initialize();
 
+    /* 2. 创建 X、Y、Z 三条坐标轴箭头 */
+    double origin[3] = {0.0, 0.0, 0.0};
+
+    // X 轴 (红色)
+    double xEnd[3] = {2.0, 0.0, 0.0};
+    double red[3]  = {1.0, 0.0, 0.0};
+    Arrow xArrow(origin, xEnd, 1, red, 2.5);
+
+    // Y 轴 (绿色)
+    double yEnd[3] = {0.0, 2.0, 0.0};
+    double green[3] = {0.0, 1.0, 0.0};
+    Arrow yArrow(origin, yEnd, 1, green, 2.5);
+
+    // Z 轴 (蓝色)
+    double zEnd[3] = {0.0, 0.0, 2.0};
+    double blue[3] = {0.0, 0.0, 1.0};
+    Arrow zArrow(origin, zEnd, 1, blue, 2.5);
+
+    /* 3. 把 Actor 加入场景 */
+    renderer->AddActor(xArrow.GetLineActor());
+    renderer->AddActor(xArrow.GetCone1Actor());
+
+    renderer->AddActor(yArrow.GetLineActor());
+    renderer->AddActor(yArrow.GetCone1Actor());
+
+    renderer->AddActor(zArrow.GetLineActor());
+    renderer->AddActor(zArrow.GetCone1Actor());
+
+    /* 4. 渲染与交互 */
+    renderer->SetBackground(0.1, 0.1, 0.1);  // 黑灰背景
+    renWin->SetSize(800, 600);
+    renWin->SetWindowName("VTK Coordinate Axes");
     renWin->Render();
-    iren->Initialize();
-    iren->Start();
+    renWinI->Start();
 
     return 0;
 }
