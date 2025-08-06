@@ -8,6 +8,7 @@ VTK_MODULE_INIT(vtkRenderingFreeType);
 VTK_MODULE_INIT(vtkRenderingVolumeOpenGL2);
 
 #include "Arrow.h"
+#include "CurveArrow.h"
 
 int main()
 {
@@ -37,7 +38,35 @@ int main()
     double blue[3] = {0.0, 0.0, 1.0};
     Arrow zArrow(origin, zEnd, 1, blue, 2.5);
 
-    /* 3. 把 Actor 加入场景 */
+    /* 3. 创建逆时针的曲线箭头 */
+    vtkNew<vtkPoints> xToYPoints;
+    xToYPoints->InsertNextPoint(xEnd);
+    xToYPoints->InsertNextPoint(1.0, 1.0, 0.0);
+    xToYPoints->InsertNextPoint(yEnd);
+
+    vtkNew<vtkPoints> yToZPoints;
+    yToZPoints->InsertNextPoint(yEnd);
+    yToZPoints->InsertNextPoint(0.0, 1.0, 1.0);
+    yToZPoints->InsertNextPoint(zEnd);
+
+    vtkNew<vtkPoints> zToXPoints;
+    zToXPoints->InsertNextPoint(zEnd);
+    zToXPoints->InsertNextPoint(1.0, 0.0, 1.0);
+    zToXPoints->InsertNextPoint(xEnd);
+
+    // X 到 Y 的曲线箭头 (黄色)
+    double yellow[3] = {1.0, 1.0, 0.0};
+    CurveArrow xToYArrow(xToYPoints, 1, yellow, 2.0);
+
+    // Y 到 Z 的曲线箭头 (青色)
+    double cyan[3] = {0.0, 1.0, 1.0};
+    CurveArrow yToZArrow(yToZPoints, 1, cyan, 2.0);
+
+    // Z 到 X 的曲线箭头 (品红色)
+    double magenta[3] = {1.0, 0.0, 1.0};
+    CurveArrow zToXArrow(zToXPoints, 1, magenta, 2.0);
+
+    /* 4. 把 Actor 加入场景 */
     renderer->AddActor(xArrow.GetLineActor());
     renderer->AddActor(xArrow.GetCone1Actor());
 
@@ -47,10 +76,19 @@ int main()
     renderer->AddActor(zArrow.GetLineActor());
     renderer->AddActor(zArrow.GetCone1Actor());
 
-    /* 4. 渲染与交互 */
+    renderer->AddActor(xToYArrow.GetCurve());
+    renderer->AddActor(xToYArrow.GetCone1());
+
+    renderer->AddActor(yToZArrow.GetCurve());
+    renderer->AddActor(yToZArrow.GetCone1());
+
+    renderer->AddActor(zToXArrow.GetCurve());
+    renderer->AddActor(zToXArrow.GetCone1());
+
+    /* 5. 渲染与交互 */
     renderer->SetBackground(0.1, 0.1, 0.1);  // 黑灰背景
     renWin->SetSize(800, 600);
-    renWin->SetWindowName("VTK Coordinate Axes");
+    renWin->SetWindowName("VTK Coordinate Axes with Curved Arrows");
     renWin->Render();
     renWinI->Start();
 
