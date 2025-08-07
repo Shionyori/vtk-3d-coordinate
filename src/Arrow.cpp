@@ -47,13 +47,13 @@ void Arrow::CreateArrow(
     double dir[3] = {0};
     vtkMath::Subtract(target, origin, dir);
 
-    // 锥体箭头
+    // 箭头
     if(coneCount >= 1)
     {
         m_coneSource1 = vtkSmartPointer<vtkConeSource>::New();
         m_coneSource1->SetCenter(target);
-        m_coneSource1->SetHeight(0.5);
-        m_coneSource1->SetRadius(0.08);
+        m_coneSource1->SetHeight(0.25);
+        m_coneSource1->SetRadius(0.04);
         m_coneSource1->SetResolution(10);
         m_coneSource1->SetDirection(dir);
 
@@ -70,8 +70,8 @@ void Arrow::CreateArrow(
 
         m_coneSource2 = vtkSmartPointer<vtkConeSource>::New();
         m_coneSource2->SetCenter(origin);
-        m_coneSource2->SetHeight(0.5);
-        m_coneSource2->SetRadius(0.08);
+        m_coneSource2->SetHeight(0.25);
+        m_coneSource2->SetRadius(0.04);
         m_coneSource2->SetResolution(10);
         m_coneSource2->SetDirection(revDir);
 

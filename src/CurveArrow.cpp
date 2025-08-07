@@ -14,10 +14,10 @@ CurveArrow::CurveArrow() = default;
 
 CurveArrow::CurveArrow(vtkSmartPointer<vtkPoints> points, int coneCount, double color[3], float lineWidth)
 {
-    CreateArrow(points, coneCount, color, lineWidth);
+    CreateCurveArrow(points, coneCount, color, lineWidth);
 }
 
-void CurveArrow::CreateArrow(vtkSmartPointer<vtkPoints> points, int coneCount, double color[3], float lineWidth)
+void CurveArrow::CreateCurveArrow(vtkSmartPointer<vtkPoints> points, int coneCount, double color[3], float lineWidth)
 {
     // 清空旧数据
     m_curve = nullptr;
@@ -58,14 +58,14 @@ void CurveArrow::CreateArrow(vtkSmartPointer<vtkPoints> points, int coneCount, d
     points->GetPoint(pointsNum - 2, origin);
     vtkMath::Subtract(target, origin, directVec);
 
-    // 箭头1
+    // 箭头
     m_coneCount = coneCount;
     if (coneCount >= 1)
     {
         m_coneSource1 = vtkSmartPointer<vtkConeSource>::New();
         m_coneSource1->SetCenter(target);
-        m_coneSource1->SetHeight(0.5);
-        m_coneSource1->SetRadius(0.08);
+        m_coneSource1->SetHeight(0.25);
+        m_coneSource1->SetRadius(0.04);
         m_coneSource1->SetResolution(10);
         m_coneSource1->SetDirection(directVec);
 
@@ -76,8 +76,6 @@ void CurveArrow::CreateArrow(vtkSmartPointer<vtkPoints> points, int coneCount, d
         m_cone1->SetMapper(coneMapper1);
         if (color) m_cone1->GetProperty()->SetColor(color);
     }
-
-    // 箭头2
     if (coneCount >= 2)
     {
         points->GetPoint(0, target);
@@ -86,8 +84,8 @@ void CurveArrow::CreateArrow(vtkSmartPointer<vtkPoints> points, int coneCount, d
 
         m_coneSource2 = vtkSmartPointer<vtkConeSource>::New();
         m_coneSource2->SetCenter(origin);
-        m_coneSource2->SetHeight(0.5);
-        m_coneSource2->SetRadius(0.08);
+        m_coneSource2->SetHeight(0.25);
+        m_coneSource2->SetRadius(0.04);
         m_coneSource2->SetResolution(10);
         m_coneSource2->SetDirection(directVec);
 
